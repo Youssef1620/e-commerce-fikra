@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIKRA - E-Commerce | فِكرة</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+    <div class="logo" onclick="resetToHome()">
+        <span>FIKRA</span>
+    </div>
+    
+    <div class="search-bar">
+        <i class="fas fa-search" style="color: #ccc; margin-left: 5px;"></i>
+        <input type="text" id="searchInput" placeholder="ابحث عن منتج أو كود... / Search product or code..." onkeyup="searchProducts()">
+    </div>
+
+    <div class="nav-actions">
+        <div class="lang-toggle" onclick="toggleLang()">
+            <span id="langBtn">EN</span>
+        </div>
+        <div class="cart-btn" onclick="openCartModal()">
+            <i class="fas fa-shopping-bag"></i>
+            <div class="cart-badge" id="cartBadge">0</div>
+        </div>
+        <button class="buy-now-btn" onclick="openCartModal()"><span data-ar="اشتري الآن" data-en="Buy Now">اشتري الآن</span></button>
+    </div>
+</nav>
+
+<div class="container">
+    <div id="categories-section" class="categories">
+        <div class="cat-badge active" onclick="filterCategory('الكل', this)" data-ar="الكل" data-en="All">الكل</div>
+        <div class="cat-badge" onclick="filterCategory('رجالي', this)" data-ar="رجالي" data-en="Men">رجالي</div>
+        <div class="cat-badge" onclick="filterCategory('حريمي', this)" data-ar="حريمي" data-en="Women">حريمي</div>
+        <div class="cat-badge" onclick="filterCategory('أحذية', this)" data-ar="أحذية" data-en="Shoes">أحذية</div>
+        <div class="cat-badge" onclick="filterCategory('إكسسوارات', this)" data-ar="إكسسوارات" data-en="Accessories">إكسسوارات</div>
+    </div>
+
+    <div class="products-grid" id="productsGrid">
+        <!-- المنتجات تنزل هنا تلقائياً -->
+    </div>
+</div>
+
+<!-- Product Details Modal -->
+<div class="modal-overlay" id="productModal">
+    <div class="modal-content">
+        <div class="close-modal" onclick="closeModal('productModal')">&times;</div>
+        <div class="modal-img-container">
+            <img id="modalImg" src="" alt="Product">
+        </div>
+        <div class="modal-details">
+            <div class="modal-code" id="modalCode">#CODE</div>
+            <h2 class="modal-title" id="modalTitle">Product Name</h2>
+            <div class="product-price" id="modalPrice" style="font-size: 1.8rem; margin-bottom: 1rem;">0 ج.م</div>
+            <p class="modal-desc" id="modalDesc">تفاصيل المنتج تظهر هنا...</p>
+            
+            <h4 style="margin-bottom: 10px; color: var(--primary);"><span data-ar="اختر اللون المفضل:" data-en="Choose preferred color:">اختر اللون المفضل:</span></h4>
+            <div class="color-options" id="modalColors">
+                <!-- خيارات الألوان -->
+            </div>
+
+            <button class="add-to-cart-btn" id="modalAddBtn" onclick="addToCartFromModal()">
+                <span data-ar="إضافة إلى العربة" data-en="Add to Cart">إضافة إلى العربة</span> <i class="fas fa-cart-plus"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Cart & Checkout Modal -->
+<div class="modal-overlay" id="cartModal">
+    <div class="modal-content" style="display: block; max-width: 600px;">
+        <div class="close-modal" onclick="closeModal('cartModal')">&times;</div>
+        
+        <div class="cart-modal-container" id="cartView">
+            <h2 class="cart-title"><span data-ar="عربة التسوق" data-en="Shopping Cart">عربة التسوق</span></h2>
+            <div id="cartItemsList">
+                <!-- عناصر العربة -->
+            </div>
+            
+            <div style="margin-top: 1.5rem; text-align: left; font-size: 1.2rem; font-weight: bold; color: var(--primary);">
+                <span data-ar="الإجمالي:" data-en="Total:">الإجمالي:</span> <span id="cartTotalSum">0</span> ج.م
+            </div>
+
+            <div class="checkout-form" id="checkoutFormDiv">
+                <h3 style="border-bottom: 1px solid #eee; padding-bottom: 10px;"><span data-ar="بيانات الفاتورة والتوصيل" data-en="Billing & Delivery Details">بيانات الفاتورة والتوصيل</span></h3>
+                
+                <div class="form-group">
+                    <label><span data-ar="الاسم بالكامل" data-en="Full Name">الاسم بالكامل</span></label>
+                    <input type="text" id="clientName" placeholder="الاسم / Full Name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label><span data-ar="رقم التواصل" data-en="Phone Number">رقم التواصل</span></label>
+                    <input type="tel" id="clientPhone" placeholder="رقم الموبايل / Phone" required>
+                </div>
+
+                <div class="form-group">
+                    <label><span data-ar="العنوان / تفاصيل إضافية" data-en="Address / Extra Details">العنوان / تفاصيل إضافية</span></label>
+                    <textarea id="clientAddress" rows="3" placeholder="العنوان بالتفصيل... / Full address..." required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label><span data-ar="أكواد المنتجات المختارة" data-en="Selected Product Codes">أكواد المنتجات المختارة</span></label>
+                    <input type="text" id="clientCodes" readonly style="background: #f0f0f0; color: var(--accent); font-weight: bold; font-family: monospace;">
+                </div>
+
+                <button class="submit-order-btn" onclick="generateFinalReceipt()">
+                    <span data-ar="تأكيد الطلب وإصدار الفاتورة" data-en="Confirm Order & Issue Invoice">تأكيد الطلب وإصدار الفاتورة</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Receipt Output -->
+        <div class="cart-modal-container receipt-view" id="receiptView">
+            <i class="fas fa-check-circle success-icon"></i>
+            <h2 style="color: var(--primary);"><span data-ar="تم تسجيل طلبك بنجاح!" data-en="Your order has been placed successfully!">تم تسجيل طلبك بنجاح!</span></h2>
+            
+            <div class="receipt-details" id="receiptContent">
+                <!-- تفاصيل الفاتورة -->
+            </div>
+            
+            <button class="add-to-cart-btn" style="margin-top: 2rem;" onclick="clearCartAndClose()">
+                <span data-ar="إغلاق ومتابعة التسوق" data-en="Close & Continue Shopping">إغلاق ومتابعة التسوق</span>
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<footer>
+    <h2>FIKRA STORE</h2>
+    <p><span data-ar="أفضل تجربة تسوق إلكترونية - مشروع تجريبي" data-en="Best Online Shopping Experience - Demo Project">أفضل تجربة تسوق إلكترونية - مشروع تجريبي</span></p>
+    <div class="footer-signatures">
+        <div class="signature-2">Dev by Fikra Team</div>
+    </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
